@@ -9,22 +9,13 @@
 A person has a number called maximum stress level.
 A person has a number called current stress level.
 
+A person has a list of stored actions called the current plan.
+
 After examining a person:
-	Say "[the noun] is [if the current stress level of the noun is greater than the maximum stress level of the noun]stressed[otherwise]not stressed";
-
-Trusts relates one person to another (called the trustee). The verb to trust(he trusts, she trusts) implies the trusts relation.
-
-Dominates relates one person to another (called the dominated). The verb to dominate (he dominates) implies the dominates relation.
-
-Likes relates one person to another (called the liked). The verb to like (he likes, she likes) implies the likes relation.
-
-Dislikes relates one person to another (called the disliked). The verb to dislike (he dislikes, she dislikes) implies the dislikes relation.
-
-Outsmart relates one person to another (called the less-smart). The verb to outsmart (he outsmarts, she outsmarts) implies the outsmart relation.
+	Say "[the noun] is [if the current stress level of the noun is greater than the maximum stress level of the noun]stressed[otherwise]not stressed[line break]";
 
 Table of Interactivity
 agent	goal	target
-Guy	"dislikes"	Harry
 Harry	"seeking"	wep
 
 [Character actions]
@@ -43,29 +34,48 @@ Carry out someone approaching:
 	try the person asked going way.
 	
 Seeking is an action applying to one thing.
-Carry out  Seeking something:
+Carry out someone seeking something:
 	let current be the holder of the person asked;
 	let lookin be a random container in current;
-	say "[person asked] attempts to open [lookin]";
-	try opening lookin;
+	let agent be the person asked;
+	try agent opening lookin;
 	if the noun is in lookin:
-		say "[person asked] attempts to take [the noun]";
-		try taking the noun;
+		say "[agent] attempts to take [the noun]";
+		try agent taking the noun;
 	otherwise:
-		Say "[The actor] says,'Guess [the noun] isn't in here'";
+		Say "[agent] says,'Guess [the noun] isn't in here'";
 
 [Forced actions per tick]
 Every turn:
-	let operator be a random visible person that is not the player;
+	[don't need to check vs. player because if it is then nothing will happen]
+	let operator be a random visible person that is not Controlled;
 	repeat through the Table of Interactivity:
+		[if statement will never be satisfied if operator is player]
 		if operator is the agent entry:
-			[say "[operator], [agent entry], [goal entry], [target entry]";]
-			[say "[line break]";]
+			[next line is for debugging]
+			[say "[operator], [agent entry], [goal entry], [target entry][line break]";]
+			let agent be the agent entry;
+			let target be the target entry;
 			if goal entry is "dislikes":
-				say "You catch [operator] gazing in annoyance at [target entry]";
+				say "You catch [operator] gazing in annoyance at [target]";
 				try operator leaving;
 			otherwise if goal entry is "seeking":
-				say "[operator] seeks [target entry]";
+				[let agent be the agent entry;
+				let target be the target entry;
+				try agent seeking target;]
+				let current be the holder of the person asked;
+				let lookin be a random container in current;
+				try agent opening lookin;
+				if target is in lookin:
+					[say "[agent] attempts to take [target]";]
+					try agent taking target;
+					if agent carries target:
+						say "[agent] says,'I found [target]'";
+					otherwise:
+						say "[agent] could not pick up [target]";
+					blank out the whole row;
+				otherwise:
+					Say "[agent] says,'Guess [target] isn't in here'";
 			break;
 
 [TODO - put in an infinite loop with a random choice, once an action is done break the loop]
@@ -139,8 +149,12 @@ Carry out an actor attacking something with something:
 		closing and locking doors.
 ]
 [Instead of the player taking something when Controlled is the player:]
-Instead of the player taking something:
-	Say "You attempt to grasp [the noun] but your ghastly hand goes right through it";
+[Instead of the player taking something:
+	Say "You attempt to grasp [the noun] but your ghastly hand goes right through it";]
+Check the player taking something:
+	if Controlled is the player:
+		say "You attempt to grasp [the noun] but your ghastly hand goes right through it";
+		stop the action;
 	
 After pushing or pulling something when Controlled is the player:
 	repeat with X running through all the visible people:
@@ -238,8 +252,76 @@ Harry is a person in the place.
 The current stress level of Harry is 0;
 The maximum stress level of Harry is 2;
 
-guy dislikes harry.
-
 The wardrobe is a closed openable container. It is in the place.
 The wep is a weapon. The wep is in the wardrobe.
 The not-wep is a thing. The not-wep is in the place.
+
+[
+	game area----------------------------------------------------
+]
+the player is in the foyer.
+[The player is in the foyer.]
+[Jock]
+Jeff is a person. He is in the foyer.
+The current stress level of Jeff is 0.
+The maximum stress level of Jeff is 5.
+
+[Shy, Comforting]
+Amanda is a person. She is in the foyer.
+The current stress level of Amanda is 0.
+The maximum stress level of Amanda is 2.
+
+[Smart]
+Eric is a person. He is in the foyer.
+The current stress level of Eric is 0.
+The maximum stress level of Eric is 3.
+
+[Partier]
+Fred is a person. He is in the foyer.
+The current stress level of Fred is 0.
+The maximum stress level of Fred is 3.
+Fred has a number called previous stress level.
+The previous stress level of Fred is 0.
+Every turn:
+	if the previous stress level of Fred is not the current stress level of Fred:
+		say "Fred wants to look for a beer";
+
+	
+
+[Events in the Living Room'] 
+
+Living Room is a room.The couch is fixed in place in the Living Room. The Fireplace is fixed in place in the Living Room.  "5 college kids entered with excitement and joy to get the party started. Then 20 seconds later they start to hear voices below the house. " 
+
+ [Setting up the doors for each room ] 
+
+The white door is east of the Living Room and west of The Kitchen. The white door is a door. The door is closed and openable. 
+
+The wood door is west of the Living Room and east of The Basement. The wood door is a door. The door is closed and openable. 
+
+The black door is north of the Living Room and south of The Bedroom. The black door is a door. The door is closed and openable. 
+
+The giant wood door is northeast of the Living Room and southwest of the Foyer. The giant wood door is a door. The door is closed and openable. 
+
+[Events in The Kitchen]
+
+The Kitchen is a room. The stove is fixed in place in The Kitchen.  The Sink is fixed in place in The Kitchen. The cabinet is fixed in place in The Kitchen.   "Jeff went to the kitchen to get some food" 
+
+[Events in The Basement] 
+
+The Basement is a room. "A dark presence lures around the room asking them to leave or die!"  
+
+The skull key is in The Basement.
+
+After taking skull key: say "This will come in handy!"
+
+[Events in The Bedroom] 
+
+The Bedroom is a room.  The bed is fixed in place in the Bedroom. The drawer is fixed in place in the Bedroom. The closet is fixed in place in the Bedroom. "Amanda changed clothes." 
+
+[Events in The Foyer] 
+
+The Foyer is a room. "THATS A BIGASS FOYER!" 
+
+[Events in The Secret Room + locakable door + key to unlock the room] 
+
+The Secret Room is a room.  The description is "BOO!" The giant black door is south of the Secret Room and north of the Foyer. The giant black door is a door. The giant black door is lockable and locked. The matching key of the giant black door is a skull key.
