@@ -1,6 +1,28 @@
 "Murder at Midnight" by Brandon Tate and Thomas Johnston
 
 [
+
+Index
+	character interaction
+		controls character goals etc
+	bodies
+		how bodies are created and what they do
+	weapons
+		definition of kind and actions involving weapons
+	ghost actions
+		actions ghosts can do
+	possession
+		gets it's own section cuz it's so big :)
+	hiding
+		possibly deprecated -> just put an item in a container
+	debug area
+		area to test features
+	game area
+		area with pieces for the final game
+		
+]
+
+[
 	character interaction--------------------------------------------
 	To do:
 		AI, stress test when people go wacko n kill
@@ -16,7 +38,8 @@ After examining a person:
 
 Table of Interactivity
 agent	goal	target
-Harry	"seeking"	wep
+Guy	"dislikes"	Harry
+Harry	"seeking"	not-wep
 
 [Character actions]
 Leaving is an action applying to nothing.
@@ -32,60 +55,44 @@ Carry out someone approaching:
 	let next be the holder of the noun;
 	let way be the best route from the current to the next;
 	try the person asked going way.
-	
+
 Seeking is an action applying to one thing.
-Carry out someone seeking something:
-	let current be the holder of the person asked;
-	let lookin be a random container in current;
-	let agent be the person asked;
-	try agent opening lookin;
-	if the noun is in lookin:
-		say "[agent] attempts to take [the noun]";
-		try agent taking the noun;
-	otherwise:
-		Say "[agent] says,'Guess [the noun] isn't in here'";
+[Understand "seek in [a container]" as seeking;]
+Carry out someone seeking:
+	repeat through the Table of Interactivity:
+		if person asked is the agent entry:
+			let agent be the agent entry;
+			let target be the target entry;
+			try silently agent taking target;
+			if the agent is carrying target:
+				say "[agent] says,'Nice, I found [target]'";
+				blank out the whole row;
+				break;
+			try agent opening the noun;
+			try silently agent taking target;
+			if the agent is carrying target:
+				say "[agent] says,'Nice, I found [target]'";
+				blank out the whole row;
+			break;
 
 [Forced actions per tick]
 Every turn:
 	[don't need to check vs. player because if it is then nothing will happen]
-	let operator be a random visible person that is not Controlled;
+	let agent be a random visible person that is not Controlled;
 	repeat through the Table of Interactivity:
-		[if statement will never be satisfied if operator is player]
-		if operator is the agent entry:
+		if agent is the agent entry:
 			[next line is for debugging]
-			[say "[operator], [agent entry], [goal entry], [target entry][line break]";]
-			let agent be the agent entry;
+			[say "[agent], [agent entry], [goal entry], [target entry][line break]";]
 			let target be the target entry;
 			if goal entry is "dislikes":
-				say "You catch [operator] gazing in annoyance at [target]";
-				try operator leaving;
+				say "You catch [agent] gazing in annoyance at [target]";
+				try agent leaving;
 			otherwise if goal entry is "seeking":
-				[let agent be the agent entry;
-				let target be the target entry;
-				try agent seeking target;]
 				let current be the holder of the person asked;
 				let lookin be a random container in current;
-				try agent opening lookin;
-				if target is in lookin:
-					[say "[agent] attempts to take [target]";]
-					try agent taking target;
-					if agent carries target:
-						say "[agent] says,'I found [target]'";
-					otherwise:
-						say "[agent] could not pick up [target]";
-					blank out the whole row;
-				otherwise:
-					Say "[agent] says,'Guess [target] isn't in here'";
+				try agent seeking lookin;
 			break;
 
-[TODO - put in an infinite loop with a random choice, once an action is done break the loop]
-[Every turn:
-	if someone (called disliker) who is visible dislikes someone (called dislikee) who is visible:
-		say "[line break]You catch [disliker] gazing in annoyance at [dislikee]";
-		try disliker leaving;
-	otherwise:
-		let looker be a random visible person that is not the player;
-		try looker seeking wep.]
 [plan rules]
 
 
@@ -153,7 +160,7 @@ Carry out an actor attacking something with something:
 	Say "You attempt to grasp [the noun] but your ghastly hand goes right through it";]
 Check the player taking something:
 	if Controlled is the player:
-		say "You attempt to grasp [the noun] but your ghastly hand goes right through it";
+		say "Your ghastly hands cannot do much with the physical world.";
 		stop the action;
 	
 After pushing or pulling something when Controlled is the player:
@@ -259,7 +266,6 @@ The not-wep is a thing. The not-wep is in the place.
 [
 	game area----------------------------------------------------
 ]
-the player is in the foyer.
 [The player is in the foyer.]
 [Jock]
 Jeff is a person. He is in the foyer.
