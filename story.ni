@@ -324,6 +324,8 @@ After taking skull key: say "This will come in handy!"
 
 The Bedroom is a room.  The bed is fixed in place in the Bedroom. The drawer is fixed in place in the Bedroom. The closet is fixed in place in the Bedroom. "Amanda changed clothes." 
 
+The ancient book is in the Bedrooom. 
+
 [Events in The Foyer] 
 
 The Foyer is a room. "THATS A BIGASS FOYER!" 
