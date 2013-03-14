@@ -33,13 +33,16 @@ A person has a number called current stress level.
 
 A person has a list of stored actions called the current plan.
 
+A person can be tough, caring or spineless.
+A person is usually spineless.
+
 After examining a person:
 	Say "[the noun] is [if the current stress level of the noun is greater than the maximum stress level of the noun]stressed[otherwise]not stressed[line break]";
 
 [If a target value is unused, fill in the name of the agent]
 Table of Interactivity
 agent	goal	target	target2
-Guy	"comfort"	Harry	Guy
+Guy	"kill"	Harry	Guy
 [Harry	"seeking"	pen	Harry]
 [Guy	"give"	Harry	pen]
 [Guy	"dislikes"	Harry	"none"]
@@ -123,6 +126,19 @@ Carry out someone giving something:
 		add seeking weapon to table if not there
 		pursue that
 ]
+Killing is an action applying to one thing.
+Carry out someone killing someone:
+	if person asked carries a weapon:
+		let implement be a random weapon carried by person asked;
+		if the noun is visible:
+			say "[person asked] screams, 'GAAAAAH', lunging at [noun]";
+			try person asked attacking noun with implement;
+		otherwise:
+			say "[person asked] says,'Hmm, I wonder where [noun] is'";
+			try person asked leaving;
+	otherwise:
+		say "I need a weapon";
+
 
 [comfort]
 Comforting is an action applying to one thing.
@@ -163,6 +179,8 @@ Every turn:
 				try agent giving target2;
 			otherwise if goal entry is "comfort":
 				try agent comforting target;
+			otherwise if goal entry is "kill":
+				try agent killing target;
 			break;
 
 [plan rules]
@@ -217,7 +235,10 @@ Check an actor attacking something with something:
 		
 [carry out attack]
 Carry out an actor attacking something with something:
-	say "You fell [the noun] with [the second noun]. [the noun]'s lifeless body falls to the ground.";
+	if Controlled is the player:
+		say "[person asked] fells [the noun] with [the second noun]. [the noun]'s lifeless body falls to the ground.";
+	otherwise:
+		say "You force [Controlled]'s body to fell [the noun] with [the second noun]. [the noun]'s lifeless body falls to the ground.";
 	remove the noun from play;
 
 [
@@ -316,8 +337,8 @@ Instead of taking inventory:
 ]
 The place is a room.
 The description of place is "[a list of persons in place]".
-The building is a room.
-The building is north of the place.
+[The building is a room.
+The building is north of the place.]
 
 [L is a list of people that varies.
 add Guy to L.
@@ -333,7 +354,7 @@ The current stress level of Harry is 0;
 The maximum stress level of Harry is 2;
 
 The wardrobe is a closed openable container. It is in the place.
-The wep is a weapon. The wep is in the wardrobe.
+The wep is a weapon. Guy carries the wep.
 The not-wep is a thing. The not-wep is in the place.
 
 [
