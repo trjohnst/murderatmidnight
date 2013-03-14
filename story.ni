@@ -39,8 +39,9 @@ After examining a person:
 [If a target value is unused, fill in the name of the agent]
 Table of Interactivity
 agent	goal	target	target2
-Harry	"seeking"	pen	Harry
-Guy	"give"	Harry	pen
+Guy	"comfort"	Harry	Guy
+[Harry	"seeking"	pen	Harry]
+[Guy	"give"	Harry	pen]
 [Guy	"dislikes"	Harry	"none"]
 
 [Character actions]
@@ -124,6 +125,16 @@ Carry out someone giving something:
 ]
 
 [comfort]
+Comforting is an action applying to one thing.
+Carry out someone comforting someone:
+	if the noun is visible:
+		say "[person asked] says,'Hey it's alright, [noun]. You don't have to worry.'[the noun] replies, 'Sorry, I guess I got carried away there'";
+	otherwise:
+		say "[person asked] says,'Hmm, I wonder where [the noun] is'";
+		decrease the current stress level of the noun by 1;
+		if the current stress level of the noun is -1:
+			now the current stress level of the noun is 0;
+		try person asked leaving;
 [restrain]
 
 [Forced actions per tick]
@@ -146,6 +157,8 @@ Every turn:
 				try agent seeking lookin;
 			otherwise if goal entry is "give":
 				try agent giving target2;
+			otherwise if goal entry is "comfort":
+				try agent comforting target;
 			break;
 
 [plan rules]
