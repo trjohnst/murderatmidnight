@@ -385,11 +385,22 @@ The giant wood door is northeast of the Living Room and southwest of the Foyer. 
 
 The Kitchen is a room. The stove is fixed in place in The Kitchen.  The Sink is fixed in place in The Kitchen. The cabinet is fixed in place in The Kitchen.   "Jeff went to the kitchen to get some food" 
 
+[container - icebox] 
+
+The Icebox is a container. The Icebox is fixed in place in the Kitchen.
+After opening the Icebox : say "EWW A DEAD BODY!"
+
+
+
 [Events in The Basement] 
 
 The Basement is a room. "A dark presence lures around the room asking them to leave or die!"  
 
-The skull key is in The Basement.
+[container - chest] 
+
+The old chest  is a container.  The old chest is in the The Basement.  The skull key is in the old chest.
+
+After opening the old chest: say "OOOH SHINEY!" 
 
 After taking skull key: say "This will come in handy!"
 
@@ -400,11 +411,21 @@ The Bedroom is a room.  The bed is fixed in place in the Bedroom. The drawer is 
 
 The ancient book is in the Bedrooom.  
 
-The description of the ancient book is "If you read this you already know that I'm dead. This house is not from our world... It's from the gates of hell! Every minute of every hour made me lose my mind, turning into something that i'm not. An evil spirit is roaming across the rooms tasting your fear. There's a key in the chest somewhere in the house that lead you to freedom. You must leave the house before midnight or else you will"
+The description of the ancient book is "If you read this you already know that I'm dead. This house is not from our world... It's from the gates of hell! Every minute of every hour made me lose my mind, turning into something that i'm not. An evil spirit is roaming across the rooms tasting your fear. There's a key in the chest somewhere in the house that lead you to freedom. You must leave the house before midnight or else you will-"
 
+[container - closet] 
+
+The closet is a container.  After opening the closet: say "AHHHHH IT'S A TRAP!"
+ 
 [Events in The Foyer] 
 
-The Foyer is a room. "THATS A BIGASS FOYER!" 
+The Foyer is a room. "THATS A BIGASS FOYER!"  
+
+[container - gold closet] 
+
+ A gold closet  is fixed in place in the Foyer. A gold closet is a container. 
+ 
+ After opening the gold closet: say "OH GOD A DEAD BODY!" 
 
 [Events in The Secret Room + locakable door + key to unlock the room] 
 
