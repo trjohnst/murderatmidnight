@@ -36,12 +36,15 @@ A person has a list of stored actions called the current plan.
 After examining a person:
 	Say "[the noun] is [if the current stress level of the noun is greater than the maximum stress level of the noun]stressed[otherwise]not stressed[line break]";
 
+[If a target value is unused, fill in the name of the agent]
 Table of Interactivity
-agent	goal	target
-Guy	"dislikes"	Harry
-Harry	"seeking"	not-wep
+agent	goal	target	target2
+Harry	"seeking"	pen	Harry
+Guy	"give"	Harry	pen
+[Guy	"dislikes"	Harry	"none"]
 
 [Character actions]
+[leaving]
 Leaving is an action applying to nothing.
 Carry out someone leaving:
 	let current be the holder of the person asked;
@@ -49,6 +52,9 @@ Carry out someone leaving:
 	let way be the best route from the current to the next;
 	try the person asked going way.
 	
+[approaching
+	go to room of the noun
+]
 Approaching is an action applying to one thing.
 Carry out someone approaching:
 	let current be the holder of the person asked;
@@ -56,8 +62,12 @@ Carry out someone approaching:
 	let way be the best route from the current to the next;
 	try the person asked going way.
 
+[seeking
+	try picking it up
+	else try opening a specified container
+		then try picking it up if its in the container
+]
 Seeking is an action applying to one thing.
-[Understand "seek in [a container]" as seeking;]
 Carry out someone seeking:
 	repeat through the Table of Interactivity:
 		if person asked is the agent entry:
@@ -73,7 +83,48 @@ Carry out someone seeking:
 			if the agent is carrying target:
 				say "[agent] says,'Nice, I found [target]'";
 				blank out the whole row;
+			otherwise:
+				say "[agent] says,'I wonder where [target] is'";
 			break;
+
+[giving
+	if can see receiver -> give
+	else -> go to random room to look for receiver'
+	
+	TODO
+		-giving while possessed
+]
+Giving is an action applying to one thing.
+Carry out someone giving something:
+	repeat through the Table of Interactivity:
+		if person asked is the agent entry:
+			let agent be agent entry;
+			let receiver be target entry;
+			let target be target2 entry;
+			if agent carries the target:
+				if receiver is visible:
+					say "[agent] says,'Here [receiver], you can have this.'[receiver] replies,'Thank you'";
+					now the receiver carries the target;
+					blank out the whole row;
+					repeat through the Table of Interactivity:
+						if goal entry is "seeking":
+							if agent entry is receiver:
+								if target entry is target:
+									blank out the whole row;
+				otherwise:
+					say "[agent] says,'Hmm, I wonder where [receiver] is'";
+					try agent leaving;
+
+[kill
+	if has a weapon and target visible -> kill
+	if has a weapon and target not visible -> look for target
+	if doesn't have a weapon
+		add seeking weapon to table if not there
+		pursue that
+]
+
+[comfort]
+[restrain]
 
 [Forced actions per tick]
 Every turn:
@@ -82,15 +133,19 @@ Every turn:
 	repeat through the Table of Interactivity:
 		if agent is the agent entry:
 			[next line is for debugging]
-			[say "[agent], [agent entry], [goal entry], [target entry][line break]";]
+			say "[agent], [agent entry], [goal entry], [target entry][line break]";
 			let target be the target entry;
+			let target2 be the target2 entry;
 			if goal entry is "dislikes":
-				say "You catch [agent] gazing in annoyance at [target]";
-				try agent leaving;
+				if target is visible:
+					say "You catch [agent] gazing in annoyance at [target]";
+					try agent leaving;
 			otherwise if goal entry is "seeking":
 				let current be the holder of the person asked;
 				let lookin be a random container in current;
 				try agent seeking lookin;
+			otherwise if goal entry is "give":
+				try agent giving target2;
 			break;
 
 [plan rules]
@@ -254,6 +309,7 @@ add Harry to L.]
 Guy is a person in the place. The description of Guy is "[if possessed]He looks rather sickly.[otherwise]A broad shouldered fellow."
 The current stress level of Guy is 0;
 The maximum stress level of Guy is 3;
+The pen is a thing. Guy carries the pen.
 
 Harry is a person in the place.
 The current stress level of Harry is 0;
