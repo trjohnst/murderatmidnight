@@ -129,12 +129,16 @@ Comforting is an action applying to one thing.
 Carry out someone comforting someone:
 	if the noun is visible:
 		say "[person asked] says,'Hey it's alright, [noun]. You don't have to worry.'[the noun] replies, 'Sorry, I guess I got carried away there'";
+		now the current stress level of the noun is 0;
+		repeat through the Table of Interactivity:
+			if goal entry is "comfort":
+				if agent entry is person asked:
+					if target entry is noun:
+						blank out the whole row;
 	otherwise:
 		say "[person asked] says,'Hmm, I wonder where [the noun] is'";
-		decrease the current stress level of the noun by 1;
-		if the current stress level of the noun is -1:
-			now the current stress level of the noun is 0;
 		try person asked leaving;
+		
 [restrain]
 
 [Forced actions per tick]
