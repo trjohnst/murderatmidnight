@@ -417,8 +417,11 @@ After taking skull key: say "This will come in handy!"
 [Events in The Bedroom] 
 
 The Bedroom is a room.  The bed is fixed in place in the Bedroom. The drawer is fixed in place in the Bedroom. The closet is fixed in place in the Bedroom. "Amanda changed clothes." 
+[Book item and  decription] 
 
-The ancient book is in the Bedrooom. 
+The ancient book is in the Bedrooom.  
+
+The description of the ancient book is "If you read this you already know that I'm dead. This house is not from our world... It's from the gates of hell! Every minute of every hour made me lose my mind, turning into something that i'm not. An evil spirit is roaming across the rooms tasting your fear. There's a key in the chest somewhere in the house that lead you to freedom. You must leave the house before midnight or else you will"
 
 [Events in The Foyer] 
 
