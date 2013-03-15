@@ -42,27 +42,41 @@ After examining a person:
 [If a target value is unused, fill in the name of the agent]
 Table of Interactivity
 agent	goal	target	target2
-Guy	"kill"	Harry	Guy
-[Harry	"seeking"	pen	Harry]
-[Guy	"give"	Harry	pen]
-[Guy	"dislikes"	Harry	"none"]
+Jeff	"seeking"	knife	Jeff
+Jeff	"none"	Jeff	Jeff
+Jeff	"none"	Jeff	Jeff
+Amanda	"dislikes"	Jeff	Amanda
+Amanda	"comfort"	Eric	Amanda
+Amanda	"none"	Amanda	Amanda
+Eric	"explore"	Fred	Fred
+Eric	"none"	Fred	Fred
+Eric	"none"	Fred	Fred
+Fred	"seeking"	beer	Eric
+Fred	"none"	Eric	Eric
+Fred	"none"	Eric	Eric
+
 
 [Character actions]
+[explore]
+Exploring is an action applying to nothing.
+Carry out someone exploring:
+	let current be the holder of the person asked;
+	let checkout be a random thing in current that is not the player;
+	silently try taking checkout;
+	if person asked carries checkout:
+		say "[person asked] looks at [checkout]";
+		[if checkout is the ancient book:
+			if person asked is Eric:
+				say, "dsa";]
+	otherwise:
+		say "[person asked] looks at [checkout]";
+			
+
 [leaving]
 Leaving is an action applying to nothing.
 Carry out someone leaving:
 	let current be the holder of the person asked;
 	let next be a random room which is adjacent to the current;
-	let way be the best route from the current to the next;
-	try the person asked going way.
-	
-[approaching
-	go to room of the noun
-]
-Approaching is an action applying to one thing.
-Carry out someone approaching:
-	let current be the holder of the person asked;
-	let next be the holder of the noun;
 	let way be the best route from the current to the next;
 	try the person asked going way.
 
@@ -80,15 +94,16 @@ Carry out someone seeking:
 			try silently agent taking target;
 			if the agent is carrying target:
 				say "[agent] says,'Nice, I found [target]'";
-				blank out the whole row;
+				now the goal entry is "none";
 				break;
 			try agent opening the noun;
 			try silently agent taking target;
 			if the agent is carrying target:
 				say "[agent] says,'Nice, I found [target]'";
-				blank out the whole row;
+				now the goal entry is "none";
 			otherwise:
-				say "[agent] says,'I wonder where [target] is'";
+				say "[agent] says,'I'm going to go look around'";
+				try agent leaving;
 			break;
 
 [giving
@@ -109,12 +124,12 @@ Carry out someone giving something:
 				if receiver is visible:
 					say "[agent] says,'Here [receiver], you can have this.'[receiver] replies,'Thank you'";
 					now the receiver carries the target;
-					blank out the whole row;
+					now the goal entry is "none";
 					repeat through the Table of Interactivity:
 						if goal entry is "seeking":
 							if agent entry is receiver:
 								if target entry is target:
-									blank out the whole row;
+									now the goal entry is "none";
 				otherwise:
 					say "[agent] says,'Hmm, I wonder where [receiver] is'";
 					try agent leaving;
@@ -131,31 +146,48 @@ Carry out someone killing someone:
 	if person asked carries a weapon:
 		let implement be a random weapon carried by person asked;
 		if the noun is visible:
-			say "[person asked] screams, 'GAAAAAH', lunging at [noun]";
+			say "[person asked]'s eyes fill red with blood and they start seizuring. [person asked] screams, 'GAAAAAH', and lunges at [noun] with [implement]";
 			try person asked attacking noun with implement;
+			say "[line break] With the willful murder of [noun], you're ghastly form thickens and a physical body forms around you. Your curse is lifted and you are free to wander the earth as a mortal.";
+			end the game in victory;
 		otherwise:
 			say "[person asked] says,'Hmm, I wonder where [noun] is'";
 			try person asked leaving;
 	otherwise:
-		say "I need a weapon";
+		let agent be the person asked;
+		let isseeking be "false";
+		repeat through the Table of Interactivity:
+			if agent is the agent entry:
+				if the goal entry is "seeking":
+					if the target entry is a weapon:
+						let current be the holder of the person asked;
+						let lookin be a random container in current;
+						try agent seeking lookin;
+						now isseeking is "true";
+		[if isseeking is "false":
+			choose a blank row in Table of Interactivity;
+			now agent entry is agent;
+			now goal entry is "seeking";
+			now target entry is knife;
+			now target2 entry is agent;]
 
 
-[comfort]
+[comfort
+	Character seeks the target to comfort them.
+]
 Comforting is an action applying to one thing.
 Carry out someone comforting someone:
 	if the noun is visible:
-		say "[person asked] says,'Hey it's alright, [noun]. You don't have to worry.'[the noun] replies, 'Sorry, I guess I got carried away there'";
+		say "[person asked] says,'Hey it's alright, [noun]. You don't have to worry.' [the noun] replies, 'Sorry, I guess I got carried away there'";
 		now the current stress level of the noun is 0;
 		repeat through the Table of Interactivity:
 			if goal entry is "comfort":
 				if agent entry is person asked:
 					if target entry is noun:
-						blank out the whole row;
+						now the goal entry is "none";
 	otherwise:
 		say "[person asked] says,'Hmm, I wonder where [the noun] is'";
 		try person asked leaving;
-		
-[restrain]
 
 [Forced actions per tick]
 Every turn:
@@ -164,52 +196,54 @@ Every turn:
 	repeat through the Table of Interactivity:
 		if agent is the agent entry:
 			[next line is for debugging]
-			say "[agent], [agent entry], [goal entry], [target entry][line break]";
+			[say "[agent], [agent entry], [goal entry], [target entry][line break]";]
 			let target be the target entry;
 			let target2 be the target2 entry;
 			if goal entry is "dislikes":
 				if target is visible:
 					say "You catch [agent] gazing in annoyance at [target]";
 					try agent leaving;
+				break;
 			otherwise if goal entry is "seeking":
 				let current be the holder of the person asked;
 				let lookin be a random container in current;
 				try agent seeking lookin;
+				break;
 			otherwise if goal entry is "give":
 				try agent giving target2;
+				break;
 			otherwise if goal entry is "comfort":
 				try agent comforting target;
+				break;
 			otherwise if goal entry is "kill":
 				try agent killing target;
-			break;
-
-[plan rules]
-
-
-
+				break;
+			otherwise if goal entry is "explore":
+				try agent exploring;
+				break;
+			otherwise if goal entry is "fears":
+				if target entry is visible:
+					try agent leaving;
+					break;
 
 [
-	bodies -------------------------------------------------------------
+	bodies--------------------------------------------------------------
 ]
-[
-A body is a kind of thing. A body is a part of every person.
+Table of Bodies
+owner	body
+Jeff	Jeff's body
+Amanda	Amanda's body
+Eric	Eric's body
+Fred	Fred's body
 
-Body-possession relates one person to one body. The verb to be owner of implies the body-possession relation.
-]
-[When play begins:
-	repeat with victim running through people:
-		let the corpse be a random body which is part of the victim;
-		now the victim is the owner of the corpse.]
-
-[actions to a body apply to the person]
-[
-Setting action variables when the noun is a body which is part of a person (called owner):
-	now the noun is the owner.
-Setting action variables when the second noun is a body which is part of a person (called owner):
-	now the second noun is the owner.
-]
-
-
+[Jeffs]
+Jeff's body is a thing.
+[Amanda]
+Amanda's body is a thing.
+[Eric]
+Eric's body is a thing.
+[Fred]
+Fred's body is a thing.
 
 [
 	weapons------------------------------------------------------------
@@ -235,40 +269,68 @@ Check an actor attacking something with something:
 		
 [carry out attack]
 Carry out an actor attacking something with something:
+	let current be the holder of the person asked;
 	if Controlled is the player:
 		say "[person asked] fells [the noun] with [the second noun]. [the noun]'s lifeless body falls to the ground.";
+		[repeat through the Table of Interactivity:
+			if agent entry is visible:
+				now goal entry is "fears";
+				now target entry is person asked;]
 	otherwise:
 		say "You force [Controlled]'s body to fell [the noun] with [the second noun]. [the noun]'s lifeless body falls to the ground.";
+		repeat with X running through visible people:
+			if X is player:
+				next;
+			if X is Controlled:
+				next;
+			if X is the noun:
+				next;
+			say "[X] runs in fear";
+			try X leaving;
+	repeat through the Table of Bodies:
+		if the owner entry is the noun:
+			now the body entry is in current;
 	remove the noun from play;
 
 [
 	ghost actions --------------------------------------------------
 	
-	ghost can lock doors
-	ways of scaring ppl
-		closing and locking doors.
+	ghost can scare people by pushing and pulling on things
+		if people get too stressed, they go mad and kill another person
 ]
-[Instead of the player taking something when Controlled is the player:]
-[Instead of the player taking something:
-	Say "You attempt to grasp [the noun] but your ghastly hand goes right through it";]
 Check the player taking something:
 	if Controlled is the player:
 		say "Your ghastly hands cannot do much with the physical world.";
 		stop the action;
 	
 After pushing or pulling something when Controlled is the player:
+	let crier be a random visible person;
+	say "[crier] says,'Alright tell me someone just [one of]saw[or]heard[stopping] that'";
 	repeat with X running through all the visible people:
 		if X is the player:
 			next;
 		Increase the current stress level of X by 1;
+		if the current stress level of X is the maximum stress level of X:
+			[add kill to goals]
+			choose row with a agent of X in Table of Interactivity;
+			now the agent entry is X;
+			now the goal entry is "kill";
+			let target be a random person;
+			while X is X:
+				if target is the player:
+					now target is a random person;
+				if target is X:
+					now target is a random person;
+				if target is not the player:
+					if target is not X:
+						break;
+			now the target2 entry is X;
+			
 
 
 
 [
 	possession--------------------------------------------
-	TODO
-		-cleaner possessing when already possessing
-			ie jumping from person to person
 ]
 Controlled is a person that varies.
 
@@ -324,43 +386,13 @@ Instead of taking inventory:
 		say "[Controlled] is carrying:[line break]";
 		list the contents of the player, with newlines, indented, giving inventory information, including contents, with extra indentation.
 
-
-
-
-[
-	hiding------------------------------------------------------------
-]
-[may just make objects for bodies and then you can put bodies in containers]
-
 [
 	debug area----------------------------------------------------
 ]
-The place is a room.
-The description of place is "[a list of persons in place]".
-[The building is a room.
-The building is north of the place.]
+The player is in the foyer.
+When play begins:
+	say "You are eternally cursed by a dark witch for the murder of your wife to be forever bound in the walls of the cabin in which the act was committed. Your only hope is such that someone, in their own free will, commits the same mortal sin that you have done so many years before. As you're ghastly form sits drearily on the floor of your cabin's foyer, you hear the sound of hope knocking at your door.[line break][line break]You hear a muffled voice, 'Yo Eric, you think you gonna finally hook up with Amanda?' Another male voice stutters, 'Well, haha umm you ... umm should no be so discourteous to a la...' A female's voice cuts in, 'Shut up Jeff, you're such a jerk, do you know that?' Then a fourth voice cuts in, 'Woah dudes, chill. Let's just get messed up and party in this house'[line break][line break]The front door opens and a jock bursts in saying,'I am Jeff! Hear me roar. Let's rage it! Spring break '09'Amanda says,'You're such an idiot, It's 2013'Jeff replies, 'Whatever, years are for queers, I call master bedroom!'[line break][line break]As Jeff begins running for your bedroom, lighting strikes the house and Amanda jumps. A red aura surrounds the cabin. Fred says, 'Woah dudes! Look out the windows! Am I trippin?' Eric says,'No you're not I see it too.' Jeff says, 'Whatever nerds, you've never seen a house surrounded by a red glow before? It's just like physics and stuff.' Fred replies, 'Yeah, sure man, I need a drink. I wonder if there's any beer here. Let's all split up and try and find a way out of here.'[line break][line break] Only you know that the witches curse has been reinvigorated. One of these teens must die by their kins hand before the next day for you to return to the mortal world.";
 
-[L is a list of people that varies.
-add Guy to L.
-add Harry to L.]
-
-Guy is a person in the place. The description of Guy is "[if possessed]He looks rather sickly.[otherwise]A broad shouldered fellow."
-The current stress level of Guy is 0;
-The maximum stress level of Guy is 3;
-The pen is a thing. Guy carries the pen.
-
-Harry is a person in the place.
-The current stress level of Harry is 0;
-The maximum stress level of Harry is 2;
-
-The wardrobe is a closed openable container. It is in the place.
-The wep is a weapon. Guy carries the wep.
-The not-wep is a thing. The not-wep is in the place.
-
-[
-	game area----------------------------------------------------
-]
-[The player is in the foyer.]
 [Jock]
 Jeff is a person. He is in the foyer.
 The current stress level of Jeff is 0.
@@ -384,70 +416,57 @@ Fred has a number called previous stress level.
 The previous stress level of Fred is 0.
 Every turn:
 	if the previous stress level of Fred is not the current stress level of Fred:
-		say "Fred wants to look for a beer";
+		if Fred carries beer:
+			say "Fred tenses up, then takes a sip of beer and mellows out";
+			now the current stress level of Fred is 0;
 
-	
+The knife is a weapon. The knife is in the kitchen.
 
 [Events in the Living Room'] 
+Living Room is a room. The description is "The couch's color has faded and it is torn in various places. There is also a fireplace set in brick. " ;
+The couch is a enterable supporter in the Living Room. The couch is fixed in place. The Fireplace is fixed in place in the Living Room. 
 
-Living Room is a room.The couch is fixed in place in the Living Room. The Fireplace is fixed in place in the Living Room.  "5 college kids entered with excitement and joy to get the party started. Then 20 seconds later they start to hear voices below the house. " 
+ [Setting up the connections for each room ] 
+The Kitchen is east of the Living room.
+The Kitchen is south of the Foyer.
+The basement is west of the Living room.
+The bedroom is north of the Living room.
+The bedroom is west of the foyer;
+The Foyer is northeast of the Living room.
 
- [Setting up the doors for each room ] 
-
-The white door is east of the Living Room and west of The Kitchen. The white door is a door. The door is closed and openable. 
-
-The wood door is west of the Living Room and east of The Basement. The wood door is a door. The door is closed and openable. 
-
-The black door is north of the Living Room and south of The Bedroom. The black door is a door. The door is closed and openable. 
-
-The giant wood door is northeast of the Living Room and southwest of the Foyer. The giant wood door is a door. The door is closed and openable. 
-
-[Events in The Kitchen]
-
-The Kitchen is a room. The stove is fixed in place in The Kitchen.  The Sink is fixed in place in The Kitchen. The cabinet is fixed in place in The Kitchen.   "Jeff went to the kitchen to get some food" 
-
-[container - icebox] 
-
-The Icebox is a container. The Icebox is fixed in place in the Kitchen.
-After opening the Icebox : say "EWW A DEAD BODY!"
+[The Kitchen]
+The Kitchen is a room. The description is "Small and in dire need of cleaning. Paint is chipping off of most everything in here."
+The stove is fixed in place in The Kitchen.  The Sink is fixed in place in The Kitchen.    
+The Icebox is a closed openable container. The Icebox is fixed in place in the Kitchen.
+beer is a thing in the icebox.
+[After opening the Icebox : say "EWW A DEAD BODY!"]
 
 
-
-[Events in The Basement] 
-
-The Basement is a room. "A dark presence lures around the room asking them to leave or die!"  
+[The Basement] 
+The Basement is a room. The description is "A dark cellar. There is barely room to stand up straight."  
 
 [container - chest] 
+The old chest  is a closed openable container.  The old chest is in the The Basement.  The skull key is in the old chest.
 
-The old chest  is a container.  The old chest is in the The Basement.  The skull key is in the old chest.
+Before opening the old chest:
+	if the person asked is Amanda:
+		say "Amanda struggles to lift the heavy top of the old chest";
 
-After opening the old chest: say "OOOH SHINEY!" 
-
-After taking skull key: say "This will come in handy!"
+After taking skull key: say "[person asked] says, 'Creepy, I wonder if this can get us out of here!'"
 
 [Events in The Bedroom] 
+The Bedroom is a room.  The bed is fixed in place in the Bedroom. The bed is a enterable supporter.The drawer is fixed in place in the Bedroom. The closet is fixed in place in the Bedroom. "A meager twin bed sits in the middle of the room. You see a set of drawers, all of which are jammed. There is also a closet." 
 
-The Bedroom is a room.  The bed is fixed in place in the Bedroom. The drawer is fixed in place in the Bedroom. The closet is fixed in place in the Bedroom. "Amanda changed clothes." 
 [Book item and  decription] 
-
 The ancient book is in the Bedrooom.  
 
-The description of the ancient book is "If you read this you already know that I'm dead. This house is not from our world... It's from the gates of hell! Every minute of every hour made me lose my mind, turning into something that i'm not. An evil spirit is roaming across the rooms tasting your fear. There's a key in the chest somewhere in the house that lead you to freedom. You must leave the house before midnight or else you will-"
+The description of the ancient book is "If you read this you already know that I'm dead. This house is not from our world... It's from the gates of hell! Every minute of every hour made me lose my mind, turning into something that i'm not. An evil spirit is roaming across the rooms tasting your fear. There's a key in the chest somewhere in the house that lead you to freedom. You must leave the house before midnight or else you may be slain by the hand of another."
 
 [container - closet] 
-
-The closet is a container.  After opening the closet: say "AHHHHH IT'S A TRAP!"
+The closet is a closed openable container.  
  
-[Events in The Foyer] 
+[The Foyer] 
+The Foyer is a room. "The foyer is not large but also not small. Although it is not meant as an attractive area of the house, there is a wooden chair to sit in and enjoy the surroundings." 
+The wooden chair is in the foyer;
 
-The Foyer is a room. "THATS A BIGASS FOYER!"  
-
-[container - gold closet] 
-
- A gold closet  is fixed in place in the Foyer. A gold closet is a container. 
- 
- After opening the gold closet: say "OH GOD A DEAD BODY!" 
-
-[Events in The Secret Room + locakable door + key to unlock the room] 
-
-The Secret Room is a room.  The description is "BOO!" The giant black door is south of the Secret Room and north of the Foyer. The giant black door is a door. The giant black door is lockable and locked. The matching key of the giant black door is a skull key.
+ A wooden chest  is fixed in place in the Foyer. A wooden chest is a closed locked container. 
